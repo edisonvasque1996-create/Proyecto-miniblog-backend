@@ -1,0 +1,17 @@
+{
+  "name": "proyecto-api-miniblog-n2-arq",
+  "version": "1.0.0",
+  "description": "Diseño del Esquema de Datos e Integridad Referencial\r Objetivo: Crear el esquema en PostgreSQL asegurando relaciones de clave foránea y borrado en cascada para evitar datos huérfanos.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "pg": "^8.23.0"
+  }
+}
