@@ -1,6 +1,5 @@
 const { loadEnvFile } = require('node:process');
 const express = require('express');
-const authorsRouter = require('./routes/authors');
 
 // Carga las variables del .env en entorno local
 try {
@@ -8,6 +7,8 @@ try {
 } catch (e) {
   // En producción (Railway) las variables las inyecta el sistema
 }
+
+const authorsRouter = require('./routes/authors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
