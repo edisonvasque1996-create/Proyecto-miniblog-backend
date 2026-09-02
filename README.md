@@ -12,6 +12,7 @@ check
 Módulo 2: Configuración del Proyecto Node.js e Infraestructura
 check
 
+Módulo 3: Servidor Principal y CRUD de Autores
 
 
 
