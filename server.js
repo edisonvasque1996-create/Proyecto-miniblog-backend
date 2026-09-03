@@ -9,6 +9,8 @@ try {
 }
 
 const authorsRouter = require('./routes/authors');
+const postsRouter = require('./routes/post');
+const commentsRouter = require('./routes/comments');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +20,8 @@ app.use(express.json());
 
 // Montaje de rutas
 app.use('/authors', authorsRouter);
+app.use('/posts', postsRouter);
+app.use('/comments', commentsRouter);
 
 // Ruta base
 app.get('/', (req, res) => {

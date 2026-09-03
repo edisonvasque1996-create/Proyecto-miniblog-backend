@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch-path=server.js --watch-path=routes --watch-path=db server.js"
   },
   "keywords": [],
   "author": "",
