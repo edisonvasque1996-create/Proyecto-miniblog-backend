@@ -37,6 +37,27 @@ npm test
 
 La API queda disponible en `http://localhost:3000`.
 
+## Preparacion para Railway
+
+El proyecto ya incluye el comando de inicio que Railway necesita:
+
+```bash
+npm start
+```
+
+En Railway configura estas variables de entorno:
+
+```env
+DATABASE_URL=URL_DE_POSTGRESQL
+NODE_ENV=production
+```
+
+Railway puede usar el servicio PostgreSQL y su variable `DATABASE_URL` directamente.
+Antes de probar los endpoints, ejecuta `database/setup.sql` en esa base de datos y,
+opcionalmente, `database/seed.sql` para cargar datos de prueba.
+
+No subas el archivo `.env`; usa `.env.example` como referencia para las variables.
+
 ## Endpoints
 
 - `GET /authors`
