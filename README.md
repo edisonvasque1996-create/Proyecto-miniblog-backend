@@ -37,6 +37,29 @@ npm test
 
 La API queda disponible en `http://localhost:3000`.
 
+## Documentacion Swagger
+
+Con el servidor iniciado, abre:
+
+```text
+http://localhost:3000/api-docs/
+```
+
+El documento OpenAPI en formato JSON está disponible en:
+
+```text
+http://localhost:3000/api-docs.json
+```
+
+En Railway, las URLs serán:
+
+```text
+https://TU-DOMINIO/api-docs/
+https://TU-DOMINIO/api-docs.json
+```
+
+Para que Swagger muestre la URL pública correcta, configura la variable `API_URL` en Railway con el dominio público de la aplicación.
+
 ## Preparacion para Railway
 
 El proyecto ya incluye el comando de inicio que Railway necesita:
