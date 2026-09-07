@@ -16,6 +16,7 @@ const openapi = require('./docs/openapi');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 app.use(express.json());
 
@@ -36,8 +37,8 @@ app.use(notFound);
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Servidor ejecutándose en el puerto ${PORT}`);
   });
 }
 
