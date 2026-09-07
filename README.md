@@ -7,7 +7,7 @@ en cascada para evitar registros huérfanos.
 
 ## Requisitos
 
-- Node.js 18 o superior.
+- Node.js 20.6 o superior.
 - PostgreSQL 14 o superior para ejecutar la API localmente.
 - npm, incluido con Node.js.
 
@@ -70,9 +70,24 @@ Ejecuta toda la suite con:
 npm test
 ```
 
-Los tests usan Vitest y Supertest y cubren principalmente validaciones,
-rutas y documentación. Para probar manualmente las operaciones que consultan
-o modifican datos, sí necesitas una conexión PostgreSQL configurada en `.env`.
+Los tests usan Vitest y Supertest. La suite cubre:
+
+- Operaciones CRUD HTTP de autores y publicaciones.
+- Validaciones de IDs, campos obligatorios, longitudes máximas y actualizaciones vacías.
+- Validación de `bio` como texto o `null`.
+- Documentación OpenAPI y Swagger UI.
+- Manejo de la actualización de `bio: null` sin conservar accidentalmente el valor anterior.
+
+Ejecuta la suite con:
+
+```bash
+npm test
+```
+
+Las pruebas automatizadas no requieren una conexión PostgreSQL porque las
+operaciones CRUD se aíslan mediante mocks de los servicios. Para probar
+manualmente las operaciones contra datos reales, sí necesitas una conexión
+PostgreSQL configurada en `.env`.
 
 ## Documentación OpenAPI
 
@@ -147,12 +162,30 @@ No subas `.env` al repositorio. Usa las variables del panel de Railway y deja
 
 ## Registro del uso de AI
 
-Se utilizó asistencia de AI como apoyo de revisión técnica y documentación:
+Se utilizó asistencia de AI como apoyo para la revisión técnica, la mejora de
+la calidad del código y la documentación del proyecto. Los puntos trabajados
+fueron:
 
-- Revisión de estructura, rutas, validaciones, servicios y manejo de errores.
-- Detección de un import no utilizado en `posts.routes.js`.
-- Mejora de comentarios técnicos y organización del README.
-- Verificación final ejecutando la suite existente de Vitest.
+- Revisión de la arquitectura por capas: rutas, controladores, servicios,
+  middlewares y configuración de PostgreSQL.
+- Verificación de los endpoints CRUD de `authors` y `posts`, además de los
+  endpoints disponibles para `comments`.
+- Revisión del esquema PostgreSQL, las claves foráneas y el borrado en cascada.
+- Confirmación de que las consultas SQL utilizan parámetros y no interpolan
+  directamente datos recibidos del cliente.
+- Mejora de las validaciones de IDs, campos obligatorios, longitudes máximas,
+  tipos de datos y cuerpos vacíos en actualizaciones.
+- Corrección del caso en que `bio: null` debía limpiar el valor existente,
+  mientras que omitir `bio` debía conservarlo.
+- Ampliación de los tests automatizados para cubrir las operaciones CRUD y
+  las nuevas reglas de validación.
+- Revisión de la documentación OpenAPI, Swagger UI, configuración local y
+  pasos de despliegue en Railway.
+- Actualización de este README para reflejar el comportamiento actual del
+  proyecto.
+
+La validación final de los cambios se realizó ejecutando la suite de Vitest:
+6 archivos y 17 tests aprobados.
 
 La lógica de negocio, las credenciales y las decisiones de despliegue deben ser
 revisadas y validadas por el equipo antes de publicar cambios.

@@ -13,17 +13,34 @@ const findAuthorById = async (id) => {
 const createAuthor = async ({ name, email, bio }) => {
   const { rows } = await pool.query(
     'INSERT INTO authors (name, email, bio) VALUES ($1, $2, $3) RETURNING *',
-    [name, email, bio || null]
+    [name, email, bio ?? null]
   );
   return rows[0];
 };
 
 const updateAuthor = async (id, { name, email, bio }) => {
+  const fields = [];
+  const values = [];
+
+  if (name !== undefined) {
+    fields.push(`name = $${values.length + 1}`);
+    values.push(name);
+  }
+  if (email !== undefined) {
+    fields.push(`email = $${values.length + 1}`);
+    values.push(email);
+  }
+  if (bio !== undefined) {
+    fields.push(`bio = $${values.length + 1}`);
+    values.push(bio);
+  }
+
+  if (fields.length === 0) return findAuthorById(id);
+
+  values.push(id);
   const { rows } = await pool.query(
-    `UPDATE authors
-     SET name = COALESCE($1, name), email = COALESCE($2, email), bio = COALESCE($3, bio)
-     WHERE id = $4 RETURNING *`,
-    [name, email, bio, id]
+    `UPDATE authors SET ${fields.join(', ')} WHERE id = $${values.length} RETURNING *`,
+    values
   );
   return rows[0] || null;
 };

@@ -1,4 +1,9 @@
-const isPositiveInteger = (value) => /^\d+$/.test(String(value)) && Number(value) > 0;
+const isPositiveInteger = (value) => {
+  const number = Number(value);
+  return /^\d+$/.test(String(value)) && Number.isSafeInteger(number) && number > 0;
+};
+
+const hasNoFields = (body) => !body || Object.keys(body).length === 0;
 
 const validateId = (req, res, next) => {
   if (!isPositiveInteger(req.params.id)) {
@@ -25,35 +30,61 @@ const validateAuthorId = (req, res, next) => {
 };
 
 const validateAuthorCreate = (req, res, next) => {
-  const { name, email } = req.body;
+  const { name, email, bio } = req.body || {};
   if (typeof name !== 'string' || name.trim() === '') {
     return res.status(400).json({ error: 'El nombre del autor no puede estar vacío' });
+  }
+  if (name.trim().length > 100) {
+    return res.status(400).json({ error: 'El nombre del autor no puede superar los 100 caracteres' });
   }
   if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
     return res.status(400).json({ error: 'El email del autor no es válido' });
   }
+  if (email.trim().length > 150) {
+    return res.status(400).json({ error: 'El email del autor no puede superar los 150 caracteres' });
+  }
+  if (bio !== undefined && bio !== null && typeof bio !== 'string') {
+    return res.status(400).json({ error: 'La bio del autor debe ser texto o null' });
+  }
   req.body.name = name.trim();
   req.body.email = email.trim();
+  if (typeof bio === 'string') req.body.bio = bio.trim();
   next();
 };
 
 const validateAuthorUpdate = (req, res, next) => {
-  const { name, email } = req.body;
+  const { name, email, bio } = req.body || {};
+  if (hasNoFields(req.body)) {
+    return res.status(400).json({ error: 'Debe enviar al menos un campo para actualizar' });
+  }
   if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
     return res.status(400).json({ error: 'El nombre del autor no puede estar vacío' });
+  }
+  if (name !== undefined && name.trim().length > 100) {
+    return res.status(400).json({ error: 'El nombre del autor no puede superar los 100 caracteres' });
   }
   if (email !== undefined && (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))) {
     return res.status(400).json({ error: 'El email del autor no es válido' });
   }
+  if (email !== undefined && email.trim().length > 150) {
+    return res.status(400).json({ error: 'El email del autor no puede superar los 150 caracteres' });
+  }
+  if (bio !== undefined && bio !== null && typeof bio !== 'string') {
+    return res.status(400).json({ error: 'La bio del autor debe ser texto o null' });
+  }
   if (name !== undefined) req.body.name = name.trim();
   if (email !== undefined) req.body.email = email.trim();
+  if (typeof bio === 'string') req.body.bio = bio.trim();
   next();
 };
 
 const validatePost = (req, res, next) => {
-  const { title, content, author_id, published } = req.body;
+  const { title, content, author_id, published } = req.body || {};
   if (typeof title !== 'string' || title.trim() === '' || typeof content !== 'string' || content.trim() === '') {
     return res.status(400).json({ error: 'Título y contenido son obligatorios' });
+  }
+  if (title.trim().length > 200) {
+    return res.status(400).json({ error: 'El título no puede superar los 200 caracteres' });
   }
   if (!isPositiveInteger(author_id)) {
     return res.status(400).json({ error: 'author_id debe ser un entero positivo' });
@@ -69,9 +100,15 @@ const validatePost = (req, res, next) => {
 };
 
 const validatePostUpdate = (req, res, next) => {
-  const { title, content, published } = req.body;
+  const { title, content, published } = req.body || {};
+  if (hasNoFields(req.body)) {
+    return res.status(400).json({ error: 'Debe enviar al menos un campo para actualizar' });
+  }
   if (title !== undefined && (typeof title !== 'string' || title.trim() === '')) {
     return res.status(400).json({ error: 'El título no puede estar vacío' });
+  }
+  if (title !== undefined && title.trim().length > 200) {
+    return res.status(400).json({ error: 'El título no puede superar los 200 caracteres' });
   }
   if (content !== undefined && (typeof content !== 'string' || content.trim() === '')) {
     return res.status(400).json({ error: 'El contenido no puede estar vacío' });
@@ -85,7 +122,7 @@ const validatePostUpdate = (req, res, next) => {
 };
 
 const validateComment = (req, res, next) => {
-  const { post_id, author_id, content } = req.body;
+  const { post_id, author_id, content } = req.body || {};
   if (!isPositiveInteger(post_id) || !isPositiveInteger(author_id)) {
     return res.status(400).json({ error: 'post_id y author_id deben ser enteros positivos' });
   }
