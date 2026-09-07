@@ -1,5 +1,7 @@
 const { Pool } = require('pg');
 
+// DATABASE_URL permite usar la conexión administrada por Railway; las demás
+// variables mantienen compatible la ejecución local con PostgreSQL.
 const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,

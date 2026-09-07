@@ -6,6 +6,7 @@ const listPosts = async () => {
 };
 
 const listPostsByAuthor = async (authorId) => {
+  // La respuesta anidada evita que el cliente tenga que resolver el autor por separado.
   const query = `
     SELECT p.id, p.title, p.content, p.published, p.created_at,
            json_build_object('id', a.id, 'name', a.name, 'email', a.email) AS author

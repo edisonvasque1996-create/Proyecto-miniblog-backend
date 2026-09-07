@@ -2,7 +2,6 @@ const express = require('express');
 const controller = require('../controllers/posts.controller');
 const {
   validateId,
-  validatePostId,
   validateAuthorId,
   validatePost,
   validatePostUpdate

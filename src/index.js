@@ -19,6 +19,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Estas rutas públicas permiten comprobar rápidamente que la API está activa
+// y consultar el contrato OpenAPI desde el navegador o una herramienta cliente.
 app.get('/', (req, res) => {
   res.json({ message: 'API MiniBlog activa', status: 'OK' });
 });
