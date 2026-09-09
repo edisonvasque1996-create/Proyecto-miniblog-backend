@@ -283,7 +283,8 @@ La lógica de negocio, las credenciales y las decisiones de despliegue deben ser
 
 - `Promp`
 
-Quiero que me ayudes a restructura todo para realizar la validacion, basicamente quiero exista un middlewares para usarlo ahi y tambien que tenga su respectivo controllers para que sea mejor organizado el proyecto 
+Quiero que me ayudes a restructura todo para realizar la validacion, basicamente quiero exista un middlewares para usarlo ahi y tambien que tenga su respectivo controllers para que sea mejor organizado el proyecto
+```text 
 miniblog-api/
 ├── src/
 │   ├── config/          # Conexión a la base de datos
@@ -299,6 +300,8 @@ miniblog-api/
 ├── .env.example         # Ejemplo de variables de entorno
 ├── .gitignore           # Archivos a ignorar en Git
 └── package.json
+```
+
 Quiero que lo restructures de esat manera y que funcione como lo esta ahorita
 
 - `Respuesta`
