@@ -2,33 +2,44 @@
 
 Proyecto desplegado en Railway: https://proyecto-miniblog-backend-production.up.railway.app/
 
-API REST para administrar autores, publicaciones y comentarios. Está construida con Node.js, Express y PostgreSQL, y separa rutas, controladores, servicios, validaciones y acceso a datos. La base de datos aplica claves foráneas y borrado en cascada para evitar registros huérfanos.
+API REST para administrar autores, publicaciones y comentarios de MiniBlog. La aplicación está construida con Node.js, Express y PostgreSQL, y sigue una arquitectura por capas con rutas, controladores, servicios, middlewares y configuración independiente. El proyecto incluye validaciones de entrada, manejo centralizado de errores, documentación OpenAPI/Swagger y pruebas automatizadas con Vitest y Supertest.
 
 ---
 
 ## Índice
 
-- [Descripción general](#descripción-general)
+- [Descripción del proyecto](#descripción-del-proyecto)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Requisitos](#requisitos)
+- [Variables de entorno](#variables-de-entorno)
 - [Instalación y ejecución local](#instalación-y-ejecución-local)
-- [Tests](#tests)
-- [Documentación OpenAPI](#documentación-openapi)
+- [Cómo ejecutar tests](#cómo-ejecutar-tests)
+- [Cómo ejecutar la documentación OpenAPI](#cómo-ejecutar-la-documentación-openapi)
 - [Deployment en Railway](#deployment-en-railway)
 - [Migración de la base de datos local a Railway](#migración-de-la-base-de-datos-local-a-railway)
-- [Endpoints](#endpoints)
+- [Endpoints principales](#endpoints-principales)
 - [Registro del uso de AI](#registro-del-uso-de-ai)
-- [Anexos de IA](#Anexos-de-AI)
+- [Anexos de IA](#anexos-de-ia)
 
 ---
 
-## Descripción general
+## Descripción del proyecto
 
-- API REST con Node.js + Express.
-- Persistencia en PostgreSQL.
-- Arquitectura por capas: rutas, controladores, servicios, middlewares y configuración.
-- Validaciones para IDs, campos obligatorios, longitudes máximas, cuerpos vacíos y manejo de `bio: null`.
-- Documentación con Swagger UI y OpenAPI.
+MiniBlog API permite:
+
+- Consultar, crear, actualizar y eliminar autores.
+- Consultar, crear, actualizar y eliminar publicaciones.
+- Listar comentarios por publicación y crear nuevos comentarios.
+- Validar parcialmente las entradas HTTP antes de consultar la base de datos.
+- Exponer documentación OpenAPI compatible con Swagger UI.
+
+Además, el proyecto se diseñó pensando en un flujo de trabajo profesional:
+
+- Cada responsabilidad está separada por capas.
+- Los servicios contienen la lógica de acceso a datos en PostgreSQL.
+- Los middlewares centralizan validaciones y errores.
+- La documentación del contrato se mantiene actualizada en un archivo OpenAPI.
+- Las pruebas automatizadas ayudan a validar el comportamiento esperado de la API.
 
 ---
 
@@ -78,29 +89,25 @@ API REST para administrar autores, publicaciones y comentarios. Está construida
 
 ## Requisitos
 
+Para ejecutar el proyecto en local necesitas:
+
 - Node.js 20.6 o superior.
-- PostgreSQL 14 o superior para ejecutar la API localmente.
-- npm, incluido con Node.js.
+- npm (incluido con Node.js).
+- PostgreSQL 14 o superior para correr la base de datos localmente.
+- Cliente `psql` (opcional pero recomendable para ejecutar `setup.sql` y `seed.sql` directamente).
 
 ---
 
-## Instalación y ejecución local
+## Variables de entorno
 
-1. Instala las dependencias:
-
-```bash
-npm install
-```
-
-2. Crea una base de datos PostgreSQL y copia `.env.example` a `.env`:
-
-```bash
-cp .env.example .env
-```
-
-En Windows también puedes copiar el archivo desde el explorador o ejecutar `copy .env.example .env` en CMD. Completa las credenciales locales. El ejemplo de configuración es:
+El archivo `.env.example` incluye la configuración recomendada para desarrollo local y para despliegue en Railway. Puedes copiarlo a `.env` y ajustar los valores:
 
 ```env
+# Railway/PostgreSQL usa esta variable en producción.
+DATABASE_URL=
+API_URL=http://localhost:3000
+
+# Variables para PostgreSQL local. Reemplaza los valores de ejemplo.
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=miniblog_db
@@ -108,31 +115,76 @@ DB_USER=miniblog_user
 DB_PASSWORD=tu_contraseña_local
 PORT=3000
 NODE_ENV=development
-API_URL=http://localhost:3000
 ```
 
-3. Ejecuta el esquema y, opcionalmente, los datos de prueba desde la raíz del proyecto:
+Notas importantes:
+
+- `DATABASE_URL` es la variable principal para Railway y también se usa en producción cuando el proyecto se despliega en un servicio PostgreSQL gestionado.
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD` permiten ejecutar la API localmente contra PostgreSQL.
+- `API_URL` se usa para configurar la documentación OpenAPI y Swagger UI con la URL correcta.
+- `PORT` es opcional en local y Railway lo inyecta automáticamente en producción.
+
+---
+
+## Instalación y ejecución local
+
+1. Clona el proyecto y entra a la carpeta raíz:
+
+```bash
+git clone <url-del-repositorio>
+cd Proyecto-API MiniBlog-N2-Arq
+```
+
+2. Instala las dependencias:
+
+```bash
+npm install
+```
+
+3. Crea tu archivo `.env` a partir del ejemplo:
+
+```bash
+cp .env.example .env
+```
+
+En Windows, si usas CMD:
+
+```bash
+copy .env.example .env
+```
+
+4. Crea la base de datos local y configura las credenciales dentro de `.env`.
+
+5. Ejecuta el esquema y, opcionalmente, los datos de prueba:
 
 ```bash
 psql -U miniblog_user -d miniblog_db -f database/setup.sql
 psql -U miniblog_user -d miniblog_db -f database/seed.sql
 ```
 
-4. Inicia la API:
+6. Inicia la API:
 
 ```bash
 npm start
 ```
 
-Para desarrollo, con reinicio automático al cambiar archivos:
+7. Para desarrollo con recarga automática cuando cambian archivos:
 
 ```bash
 npm run dev
 ```
 
-La API queda disponible en `http://localhost:3000`.
+La API queda disponible en:
 
-## Tests
+```text
+http://localhost:3000
+```
+
+El endpoint raíz (`GET /`) devuelve un mensaje de salud, y la documentación OpenAPI queda disponible en `http://localhost:3000/api-docs/`.
+
+---
+
+## Cómo ejecutar tests
 
 Ejecuta toda la suite con:
 
@@ -140,15 +192,40 @@ Ejecuta toda la suite con:
 npm test
 ```
 
-Los tests usan Vitest y Supertest. La suite cubre:
+La suite usa Vitest + Supertest y cubre los siguientes aspectos:
 
-- Operaciones CRUD HTTP de autores y publicaciones.
+- Operaciones CRUD HTTP de autores, publicaciones y comentarios.
 - Validaciones de IDs, campos obligatorios, longitudes máximas y actualizaciones vacías.
 - Validación de `bio` como texto o `null`.
 - Documentación OpenAPI y Swagger UI.
-- Manejo de la actualización de `bio: null` sin conservar accidentalmente el valor anterior.
+- Comportamiento de la API con datos de prueba y manejo de errores.
 
-Las pruebas automatizadas no requieren una conexión PostgreSQL porque las operaciones CRUD se aíslan mediante mocks de los servicios. Para probar manualmente las operaciones contra datos reales, sí necesitas una conexión PostgreSQL configurada en `.env`.
+> Nota: las pruebas automatizadas no requieren una conexión PostgreSQL activa porque el proyecto encapsula la lógica con mocks en sus tests. Para probar manualmente las rutas con datos reales, sí necesitarás una base PostgreSQL configurada en `.env`.
+
+---
+
+## Cómo ejecutar la documentación OpenAPI
+
+Con la API corriendo, puedes consultar la documentación en:
+
+```text
+http://localhost:3000/api-docs/
+```
+
+Y el contrato OpenAPI JSON en:
+
+```text
+http://localhost:3000/api-docs.json
+```
+
+En producción, por ejemplo con Railway, la documentación queda expuesta en:
+
+```text
+https://TU-DOMINIO.up.railway.app/api-docs/
+https://TU-DOMINIO.up.railway.app/api-docs.json
+```
+
+La variable `API_URL` debe apuntar a la URL pública del servicio para que Swagger muestre correctamente el servidor asociado al documento.
 
 ---
 
@@ -179,9 +256,15 @@ Configura `API_URL` con esa URL pública para que Swagger muestre el servidor co
 
 ## Deployment en Railway
 
-1. Sube el repositorio a GitHub y crea un nuevo servicio desde ese repositorio en Railway.
-2. Añade un servicio PostgreSQL en el mismo proyecto. Railway expondrá su cadena de conexión en `DATABASE_URL`.
-3. Configura en el servicio de la API:
+### 1) Preparar el repositorio
+
+1. Sube el proyecto a un repositorio de GitHub.
+2. En Railway crea un nuevo servicio desde ese repositorio.
+3. Añade un servicio PostgreSQL al mismo proyecto para tener una base de datos gestionada por Railway.
+
+### 2) Variables de entorno recomendadas
+
+En el panel de Railway del servicio de la API, configura aproximadamente esto:
 
 ```env
 DATABASE_URL=${{Postgres.DATABASE_URL}}
@@ -189,14 +272,44 @@ NODE_ENV=production
 API_URL=https://TU-DOMINIO.up.railway.app
 ```
 
-El nombre exacto de la referencia puede variar según el nombre que Railway asigne al servicio PostgreSQL; también puedes pegar directamente su valor.
+Si el nombre exacto de la referencia no coincide con `Postgres`, puedes pegar la cadena de conexión directamente en `DATABASE_URL`. También puedes definir manualmente `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` y `DB_PASSWORD`, aunque normalmente `DATABASE_URL` es suficiente cuando el servicio de base de datos está en Railway.
 
-4. Railway ejecutará `npm start`. El servidor usa `PORT`, que Railway asigna automáticamente; no es necesario fijarlo en producción.
-5. Ejecuta `database/setup.sql` contra la base de datos de Railway y, si lo necesitas, `database/seed.sql`. Puedes hacerlo desde un cliente PostgreSQL usando la internal URL del servicio de base de datos, que evita salir a Internet entre servicios del mismo proyecto.
+### 3) Internal URL vs Public URL
 
-La public URL es el dominio HTTP del servicio de la API y es la dirección que usarán los clientes, Swagger y `API_URL`. La internal URL pertenece a la red privada de Railway y sirve para conexiones internas, migraciones o clientes administrativos; no debe publicarse como URL de la API.
+Es importante distinguir ambos conceptos:
 
-No subas `.env` al repositorio. Usa las variables del panel de Railway y deja `.env.example` como referencia.
+- Public URL: es la URL externa del servicio de la API, por ejemplo `https://TU-DOMINIO.up.railway.app`. Es la que usan clientes, navegadores y Swagger.
+- Internal URL: es la URL privada del servicio de PostgreSQL dentro de la red de Railway. Se usa para conexiones internas, migraciones y tareas administrativas entre servicios del mismo proyecto.
+
+No publiques la Internal URL como endpoint de la API. La Internal URL sirve para ejecutar scripts de inicialización desde el mismo proyecto o desde otra herramienta conectada a Railway; la Public URL debe ser la que uses en `API_URL` y en la documentación.
+
+### 4) Inicializar la base de datos en Railway
+
+Una vez creado el servicio PostgreSQL en Railway:
+
+```bash
+psql "<internal-url-del-servicio-postgres>" -f database/setup.sql
+psql "<internal-url-del-servicio-postgres>" -f database/seed.sql
+```
+
+> Si solo quieres el esquema base, basta con `database/setup.sql`. El archivo `seed.sql` es útil para cargar datos de ejemplo.
+
+### 5) Ejecutar la aplicación
+
+Railway ejecutará automáticamente el comando definido en `package.json`:
+
+```json
+"start": "node src/index.js"
+```
+
+Por lo tanto, no es necesario tocar la configuración de arranque si el servicio está conectado correctamente al repositorio.
+
+### 6) Recomendaciones finales
+
+- No subas `.env` al repositorio.
+- Mantén `.env.example` actualizado como referencia base.
+- Revisa que `API_URL` corresponda a la Public URL del servicio para que `/api-docs` y `/api-docs.json` generen enlaces correctos.
+- Si usas `DATABASE_URL`, asegurate de que `src/config/database.js` reciba esa variable con el formato adecuado.
 
 ---
 
@@ -259,22 +372,24 @@ API_URL=https://TU-DOMINIO.up.railway.app
 
 ## Registro del uso de AI
 
-Se utilizó asistencia de AI como apoyo para la revisión técnica, la mejora de la calidad del código y la documentación del proyecto. Los puntos trabajados fueron:
+Se utilizó asistencia de IA como apoyo en el desarrollo, revisión y documentación del proyecto. El uso de IA quedó centrado en tareas de apoyo técnico y calidad, no como sustituto de la validación final por parte del equipo.
 
-- Revisión de la arquitectura por capas: rutas, controladores, servicios, middlewares y configuración de PostgreSQL.
-- Verificación de los endpoints CRUD de `authors` y `posts`, además de los endpoints disponibles para `comments`.
-- Revisión del esquema PostgreSQL, las claves foráneas y el borrado en cascada.
-- Confirmación de que las consultas SQL utilizan parámetros y no interpolan directamente datos recibidos del cliente.
-- Mejora de las validaciones de IDs, campos obligatorios, longitudes máximas, tipos de datos y cuerpos vacíos en actualizaciones.
-- Corrección del caso en que `bio: null` debía limpiar el valor existente, mientras que omitir `bio` debía conservarlo.
-- Ampliación de los tests automatizados para cubrir las operaciones CRUD y las nuevas reglas de validación.
-- Revisión de la documentación OpenAPI, Swagger UI, configuración local y pasos de despliegue en Railway.
-- Actualización de este README para reflejar el comportamiento actual del proyecto.
-- Soluciones de errores 
+Puntos en los que se apoyó la IA:
 
-La validación final de los cambios se realizó ejecutando la suite de Vitest: 6 archivos y 17 tests aprobados.
+- Revisión de la arquitectura por capas del proyecto y sugerencias de organización para rutas, controladores, servicios, middlewares y configuración.
+- Verificación del flujo CRUD para `authors`, `posts` y `comments`.
+- Revisión del esquema de PostgreSQL, especialmente claves foráneas, borrado en cascada y consistencia referencial.
+- Confirmación de que las consultas SQL usan parámetros en lugar de interpolar datos recibidos desde el cliente.
+- Mejora de validaciones para IDs, campos obligatorios, longitudes máximas, tipos de datos y manejo de payloads vacíos o parciales.
+- Corrección del comportamiento de `bio: null` para limpiar el valor previo sin afectar el resto de la actualización.
+- Ampliación de la suite de tests automatizados para cubrir casos reales de CRUD y validación.
+- Revisión de la documentación OpenAPI, Swagger UI, variables de entorno y pasos para despliegue en Railway.
+- Redacción y actualización de este README para que refleje el estado actual del proyecto.
+- Diagnóstico y corrección de errores de despliegue y configuración en entornos públicos.
 
-La lógica de negocio, las credenciales y las decisiones de despliegue deben ser revisadas y validadas por el equipo antes de publicar cambios.
+La validación final de los cambios se realizó ejecutando la suite de Vitest y revisando el comportamiento de la API en local y con documentación OpenAPI.
+
+> La lógica de negocio, las credenciales y las decisiones de despliegue deben ser revisadas y validadas por el equipo antes de publicar cambios en producción.
 ---
 
 ## Anexos de AI
